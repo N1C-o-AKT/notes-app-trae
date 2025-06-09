@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Editor styles */
+.editor {
+  @apply prose prose-slate dark:prose-invert max-w-none;
+}
+
+.editor h1 {
+  @apply text-2xl font-bold mb-4;
+}
+
+.editor h2 {
+  @apply text-xl font-semibold mb-3;
+}
+
+.editor h3 {
+  @apply text-lg font-medium mb-2;
+}
+
+.editor p {
+  @apply mb-3 leading-relaxed;
+}
+
+.editor ul, .editor ol {
+  @apply mb-3 pl-6;
+}
+
+.editor li {
+  @apply mb-1;
+}
+
+.editor blockquote {
+  @apply border-l-4 border-primary-500 pl-4 italic my-4;
+}
+
+.editor code {
+  @apply bg-secondary-100 dark:bg-secondary-800 px-1 py-0.5 rounded text-sm;
+}
+
+.editor pre {
+  @apply bg-secondary-100 dark:bg-secondary-800 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.editor pre code {
+  @apply bg-transparent p-0;
+}
