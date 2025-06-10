@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/Button'
 import { DropdownMenu } from '@/components/ui/DropdownMenu'
 import { NoteCard } from '@/components/notes/NoteCard'
 import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import fr from 'date-fns/locale/fr'
 
 interface SidebarProps {
   isOpen: boolean
@@ -31,7 +31,7 @@ interface SidebarProps {
   selectedNote: Note | null
   onSelectNote: (note: Note) => void
   onCreateNote: () => void
-  onDeleteNote: (id: string) => void
+  onDeleteNote: (id: string) => Promise<void>
   viewMode: 'list' | 'grid'
   onViewModeChange: (mode: 'list' | 'grid') => void
 }
@@ -269,9 +269,10 @@ export function Sidebar({
                                 </div>
                               ),
                               onClick: (e) => {
-                                e.stopPropagation()
+                                e?.stopPropagation()
                                 // toggleFavorite(note.id)
                               },
+                              type: 'item' as const,
                             },
                             {
                               label: (
@@ -281,9 +282,10 @@ export function Sidebar({
                                 </div>
                               ),
                               onClick: (e) => {
-                                e.stopPropagation()
+                                e?.stopPropagation()
                                 // toggleArchive(note.id)
                               },
+                              type: 'item' as const,
                             },
                             {
                               label: (
@@ -292,10 +294,11 @@ export function Sidebar({
                                   <span>Supprimer</span>
                                 </div>
                               ),
-                              onClick: (e) => {
-                                e.stopPropagation()
-                                onDeleteNote(note.id)
+                              onClick: async (e) => {
+                                e?.stopPropagation()
+                                await onDeleteNote(note.id)
                               },
+                              type: 'item' as const,
                             },
                           ]}
                         />

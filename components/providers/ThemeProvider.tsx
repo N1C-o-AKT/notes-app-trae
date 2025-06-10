@@ -3,9 +3,9 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import Cookies from 'js-cookie'
 
-type Theme = 'light' | 'dark' | 'system'
+export type Theme = 'light' | 'dark' | 'system'
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme
   setTheme: (theme: Theme) => void
   resolvedTheme: 'light' | 'dark'

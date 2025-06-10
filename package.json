@@ -11,6 +11,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
     "@tailwindcss/typography": "^0.5.10",
+    "@types/date-fns": "^2.5.3",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",

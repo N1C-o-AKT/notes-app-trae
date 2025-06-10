@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 
-interface DropdownItem {
-  label: React.ReactNode
+export interface DropdownItem {
+  label?: React.ReactNode
   onClick?: (e?: React.MouseEvent) => void
   active?: boolean
   disabled?: boolean

@@ -1,20 +1,21 @@
-import { supabase, Tables, Inserts, Updates } from './supabase'
+import { supabase } from './supabase'
 import { Note, Category, Attachment } from '@/hooks/useNotes'
+import { Tables, TablesInsert, TablesUpdate } from '@/types/supabase'
 
 // Helper function to convert database row to Note interface
 function dbNoteToNote(dbNote: Tables<'notes'>, category?: Tables<'categories'>, attachments: Tables<'attachments'>[] = []): Note {
   return {
     id: dbNote.id,
     title: dbNote.title,
-    content: dbNote.content,
+    content: dbNote.content || '',
     tags: dbNote.tags || [],
     category: category?.name || 'Personnel',
-    isFavorite: dbNote.is_favorite,
-    isArchived: dbNote.is_archived,
-    isProtected: dbNote.is_protected,
+    isFavorite: dbNote.is_favorite || false,
+    isArchived: dbNote.is_archived || false,
+    isProtected: dbNote.is_protected || false,
     password: dbNote.password_hash || undefined,
-    createdAt: new Date(dbNote.created_at),
-    updatedAt: new Date(dbNote.updated_at),
+    createdAt: new Date(dbNote.created_at || new Date()),
+    updatedAt: new Date(dbNote.updated_at || new Date()),
     attachments: attachments.map(att => ({
       id: att.id,
       name: att.name,
@@ -26,7 +27,7 @@ function dbNoteToNote(dbNote: Tables<'notes'>, category?: Tables<'categories'>, 
 }
 
 // Helper function to convert Note to database insert
-function noteToDbInsert(note: Partial<Note>, categoryId?: string): Inserts<'notes'> {
+function noteToDbInsert(note: Partial<Note>, categoryId?: string): TablesInsert<'notes'> {
   return {
     id: note.id,
     title: note.title || 'Nouvelle note',
@@ -41,8 +42,8 @@ function noteToDbInsert(note: Partial<Note>, categoryId?: string): Inserts<'note
 }
 
 // Helper function to convert Note to database update
-function noteToDbUpdate(note: Partial<Note>, categoryId?: string): Updates<'notes'> {
-  const update: Updates<'notes'> = {}
+function noteToDbUpdate(note: Partial<Note>, categoryId?: string): TablesUpdate<'notes'> {
+  const update: TablesUpdate<'notes'> = {}
   
   if (note.title !== undefined) update.title = note.title
   if (note.content !== undefined) update.content = note.content
@@ -106,7 +107,7 @@ export const categoriesService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('User not authenticated')
     
-    const updateData: Updates<'categories'> = {}
+    const updateData: TablesUpdate<'categories'> = {}
     if (updates.name !== undefined) updateData.name = updates.name
     if (updates.color !== undefined) updateData.color = updates.color
     if (updates.parentId !== undefined) updateData.parent_id = updates.parentId || null

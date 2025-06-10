@@ -31,7 +31,7 @@ import { DropdownMenu } from '@/components/ui/DropdownMenu'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import fr from 'date-fns/locale/fr'
 
 interface NoteEditorProps {
   note: Note
@@ -227,7 +227,8 @@ export function NoteEditor({ note, onUpdateNote, onClose }: NoteEditorProps) {
                       <span>{note.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
                     </div>
                   ),
-                  onClick: () => onUpdateNote(note.id, { isFavorite: !note.isFavorite }),
+                  onClick: async () => await onUpdateNote(note.id, { isFavorite: !note.isFavorite }),
+                  type: 'item' as const,
                 },
                 {
                   label: (
@@ -236,7 +237,8 @@ export function NoteEditor({ note, onUpdateNote, onClose }: NoteEditorProps) {
                       <span>{note.isArchived ? 'Désarchiver' : 'Archiver'}</span>
                     </div>
                   ),
-                  onClick: () => onUpdateNote(note.id, { isArchived: !note.isArchived }),
+                  onClick: async () => await onUpdateNote(note.id, { isArchived: !note.isArchived }),
+                  type: 'item' as const,
                 },
                 {
                   label: (
@@ -245,7 +247,8 @@ export function NoteEditor({ note, onUpdateNote, onClose }: NoteEditorProps) {
                       <span>{note.isProtected ? 'Déverrouiller' : 'Protéger'}</span>
                     </div>
                   ),
-                  onClick: () => onUpdateNote(note.id, { isProtected: !note.isProtected }),
+                  onClick: async () => await onUpdateNote(note.id, { isProtected: !note.isProtected }),
+                  type: 'item' as const,
                 },
                 { type: 'divider' as const },
                 {
@@ -256,6 +259,7 @@ export function NoteEditor({ note, onUpdateNote, onClose }: NoteEditorProps) {
                     </div>
                   ),
                   onClick: () => {},
+                  type: 'item' as const,
                 },
                 {
                   label: (
@@ -265,6 +269,7 @@ export function NoteEditor({ note, onUpdateNote, onClose }: NoteEditorProps) {
                     </div>
                   ),
                   onClick: () => {},
+                  type: 'item' as const,
                 },
               ]}
             />

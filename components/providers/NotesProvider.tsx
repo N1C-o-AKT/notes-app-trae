@@ -1,11 +1,12 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { supabase } from '@/lib/supabase'
 import { notesService, categoriesService } from '@/lib/database'
 import { useAuth } from './AuthProvider'
+import { format as formatDate } from 'date-fns'
+import fr from 'date-fns/locale/fr'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface Note {
   id: string
@@ -37,8 +38,8 @@ export interface Category {
   parentId?: string
 }
 
-type SortBy = 'date' | 'title' | 'category' | 'updated'
-type SortOrder = 'asc' | 'desc'
+export type SortBy = 'date' | 'title' | 'category' | 'updated'
+export type SortOrder = 'asc' | 'desc'
 
 interface NotesContextType {
   notes: Note[]
@@ -191,7 +192,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const addCategory = (name: string, color: string, parentId?: string) => {
+  const addCategory = async (name: string, color: string, parentId?: string): Promise<void> => {
     const newCategory: Category = {
       id: uuidv4(),
       name,
@@ -201,13 +202,13 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     setCategories(prev => [...prev, newCategory])
   }
 
-  const updateCategory = (id: string, updates: Partial<Category>) => {
+  const updateCategory = async (id: string, updates: Partial<Category>): Promise<void> => {
     setCategories(prev => prev.map(cat => 
       cat.id === id ? { ...cat, ...updates } : cat
     ))
   }
 
-  const deleteCategory = (id: string) => {
+  const deleteCategory = async (id: string): Promise<void> => {
     setCategories(prev => prev.filter(cat => cat.id !== id))
     // Update notes that use this category
     setNotes(prev => prev.map(note => 
@@ -237,7 +238,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         mimeType = 'text/plain'
         break
       case 'md':
-        content = `# ${note.title}\n\n${note.content}\n\n---\n\nTags: ${note.tags.join(', ')}\nCatégorie: ${note.category}\nCréé le: ${format(note.createdAt, 'dd/MM/yyyy à HH:mm', { locale: fr })}`
+        content = `# ${note.title}\n\n${note.content}\n\n---\n\nTags: ${note.tags.join(', ')}\nCatégorie: ${note.category}\nCréé le: ${formatDate(note.createdAt, 'dd/MM/yyyy à HH:mm')}`
         filename = `${note.title}.md`
         mimeType = 'text/markdown'
         break

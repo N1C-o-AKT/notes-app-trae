@@ -4,7 +4,10 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-interface AuthContextType {
+// Re-export User type from Supabase
+export type { User } from '@supabase/supabase-js'
+
+export interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean

@@ -2,7 +2,7 @@
 
 import { Note } from '@/hooks/useNotes'
 import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import fr from 'date-fns/locale/fr'
 import { 
   Star, 
   Archive, 
@@ -119,6 +119,7 @@ export function NoteCard({
                   e?.stopPropagation()
                   onClick()
                 },
+                type: 'item' as const,
               },
               {
                 label: (
@@ -127,10 +128,11 @@ export function NoteCard({
                     <span>{note.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
                   </div>
                 ),
-                onClick: (e) => {
+                onClick: async (e) => {
                   e?.stopPropagation()
-                  onToggleFavorite?.()
+                  await onToggleFavorite?.()
                 },
+                type: 'item' as const,
               },
               {
                 label: (
@@ -139,10 +141,11 @@ export function NoteCard({
                     <span>{note.isArchived ? 'Désarchiver' : 'Archiver'}</span>
                   </div>
                 ),
-                onClick: (e) => {
+                onClick: async (e) => {
                   e?.stopPropagation()
-                  onToggleArchive?.()
+                  await onToggleArchive?.()
                 },
+                type: 'item' as const,
               },
               {
                 label: (
@@ -155,6 +158,7 @@ export function NoteCard({
                   e?.stopPropagation()
                   onShare?.()
                 },
+                type: 'item' as const,
               },
               { type: 'divider' as const },
               {
@@ -164,10 +168,11 @@ export function NoteCard({
                     <span>Supprimer</span>
                   </div>
                 ),
-                onClick: (e) => {
+                onClick: async (e) => {
                   e?.stopPropagation()
-                  onDelete()
+                  await onDelete()
                 },
+                type: 'item' as const,
               },
             ]}
           />

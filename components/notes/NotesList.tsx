@@ -1,6 +1,6 @@
 'use client'
 
-import { useNotes } from '@/hooks/useNotes'
+import { useNotes, SortBy } from '@/hooks/useNotes'
 import { NoteCard } from './NoteCard'
 import { useState } from 'react'
 import { Search, Filter, SortAsc, SortDesc } from 'lucide-react'
@@ -14,43 +14,22 @@ interface NotesListProps {
 
 type SortOption = {
   label: string
-  value: 'title' | 'updatedAt' | 'createdAt' | 'category'
+  value: SortBy
 }
 
 export function NotesList({ viewMode, searchQuery = '' }: NotesListProps) {
-  const { notes, selectNote, deleteNote, toggleFavorite, toggleArchive } = useNotes()
-  const [sortBy, setSortBy] = useState<SortOption['value']>('updatedAt')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const { notes, selectNote, deleteNote, toggleFavorite, toggleArchive, setSorting, sortBy, sortOrder } = useNotes()
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
   const [filterTags, setFilterTags] = useState<string[]>([])
 
   const sortOptions: SortOption[] = [
     { label: 'Titre', value: 'title' },
-    { label: 'Date de modification', value: 'updatedAt' },
-    { label: 'Date de création', value: 'createdAt' },
+    { label: 'Date de modification', value: 'updated' },
+    { label: 'Date de création', value: 'date' },
     { label: 'Catégorie', value: 'category' },
   ]
 
-  const sortedNotes = [...(notes || [])].sort((a, b) => {
-    let comparison = 0
-    
-    switch (sortBy) {
-      case 'title':
-        comparison = (a.title || '').localeCompare(b.title || '')
-        break
-      case 'category':
-        comparison = (a.category || '').localeCompare(b.category || '')
-        break
-      case 'createdAt':
-        comparison = (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0)
-        break
-      case 'updatedAt':
-        comparison = (a.updatedAt?.getTime() || 0) - (b.updatedAt?.getTime() || 0)
-        break
-    }
-    
-    return sortOrder === 'asc' ? comparison : -comparison
-  })
+  const sortedNotes = [...(notes || [])]
 
   // Get all unique categories and tags for filters
   const categories = Array.from(new Set((notes || []).map(note => note.category)))
@@ -106,18 +85,19 @@ export function NotesList({ viewMode, searchQuery = '' }: NotesListProps) {
                     )}
                   </div>
                 ),
-                onClick: () => setSortBy(option.value),
+                onClick: () => setSorting(option.value, sortOrder),
+                type: 'item' as const,
               })),
               { type: 'divider' as const },
               {
-                label: 'Ordre croissant',
-                onClick: () => setSortOrder('asc'),
-                active: sortOrder === 'asc',
-              },
-              {
-                label: 'Ordre décroissant',
-                onClick: () => setSortOrder('desc'),
-                active: sortOrder === 'desc',
+                label: (
+                  <div className="flex items-center gap-2">
+                    {sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+                    <span>{sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}</span>
+                  </div>
+                ),
+                onClick: () => setSorting(sortBy, sortOrder === 'asc' ? 'desc' : 'asc'),
+                type: 'item' as const,
               },
             ]}
           />
@@ -140,11 +120,13 @@ export function NotesList({ viewMode, searchQuery = '' }: NotesListProps) {
                 label: 'Toutes les catégories',
                 onClick: () => setFilterCategory(null),
                 active: filterCategory === null,
+                type: 'item' as const,
               },
               ...categories.map(category => ({
                 label: category,
                 onClick: () => setFilterCategory(category),
                 active: filterCategory === category,
+                type: 'item' as const,
               })),
               { type: 'divider' as const },
               { type: 'header' as const, label: 'Tags' },
@@ -158,6 +140,7 @@ export function NotesList({ viewMode, searchQuery = '' }: NotesListProps) {
                   }
                 },
                 active: filterTags.includes(tag),
+                type: 'item' as const,
               })),
               { type: 'divider' as const },
               {
@@ -166,6 +149,7 @@ export function NotesList({ viewMode, searchQuery = '' }: NotesListProps) {
                   setFilterCategory(null)
                   setFilterTags([])
                 },
+                type: 'item' as const,
               },
             ]}
           />
