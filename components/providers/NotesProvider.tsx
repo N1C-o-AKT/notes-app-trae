@@ -110,7 +110,9 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true)
       setError(null)
       
-      const newNote: Partial<Note> = {
+      const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      const newNote: Note = {
         id: uuidv4(),
         title: 'Nouvelle note',
         content: '',
@@ -118,13 +120,21 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
         category: 'Personnel',
         isFavorite: false,
         isArchived: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         attachments: [],
         isProtected: false,
       }
       
-      const createdNote = await notesService.create(newNote)
-      setNotes(prev => [createdNote, ...prev])
-      setSelectedNote(createdNote)
+      if (hasSupabaseConfig) {
+        const createdNote = await notesService.create(newNote)
+        setNotes(prev => [createdNote, ...prev])
+        setSelectedNote(createdNote)
+      } else {
+        // Mode local sans Supabase
+        setNotes(prev => [newNote, ...prev])
+        setSelectedNote(newNote)
+      }
     } catch (err) {
       console.error('Erreur lors de la création de la note:', err)
       setError('Impossible de créer la note')
@@ -138,14 +148,33 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true)
       setError(null)
       
-      const updatedNote = await notesService.update(id, updates)
+      const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
       
-      setNotes(prev => prev.map(note => 
-        note.id === id ? updatedNote : note
-      ))
-      
-      if (selectedNote?.id === id) {
-        setSelectedNote(updatedNote)
+      if (hasSupabaseConfig) {
+        const updatedNote = await notesService.update(id, updates)
+        
+        setNotes(prev => prev.map(note => 
+          note.id === id ? updatedNote : note
+        ))
+        
+        if (selectedNote?.id === id) {
+          setSelectedNote(updatedNote)
+        }
+      } else {
+        // Mode local sans Supabase
+        const updatedNote = {
+          ...notes.find(note => note.id === id)!,
+          ...updates,
+          updatedAt: new Date()
+        }
+        
+        setNotes(prev => prev.map(note => 
+          note.id === id ? updatedNote : note
+        ))
+        
+        if (selectedNote?.id === id) {
+          setSelectedNote(updatedNote)
+        }
       }
     } catch (err) {
       console.error('Erreur lors de la mise à jour de la note:', err)
@@ -160,8 +189,13 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true)
       setError(null)
       
-      await notesService.delete(id)
+      const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
       
+      if (hasSupabaseConfig) {
+        await notesService.delete(id)
+      }
+      
+      // Supprimer localement dans tous les cas
       setNotes(prev => prev.filter(note => note.id !== id))
       if (selectedNote?.id === id) {
         setSelectedNote(null)
@@ -316,6 +350,17 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true)
       setError(null)
+      
+      // Vérifier si les variables d'environnement Supabase sont disponibles
+      const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (!hasSupabaseConfig) {
+        // Mode dégradé sans Supabase - utiliser les données par défaut
+        console.warn('Configuration Supabase manquante, utilisation du mode local')
+        setCategories(defaultCategories)
+        setNotes([])
+        return
+      }
       
       // Load categories from Supabase
       let loadedCategories = await categoriesService.getAll()

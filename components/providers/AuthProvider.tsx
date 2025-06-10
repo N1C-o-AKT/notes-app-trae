@@ -25,12 +25,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Vérifier si les variables d'environnement Supabase sont disponibles
+    const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    
+    if (!hasSupabaseConfig) {
+      // Mode dégradé sans Supabase
+      setLoading(false)
+      return
+    }
+
     // Récupérer la session initiale
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSession(session)
+        setUser(session?.user ?? null)
+      } catch (error) {
+        console.warn('Erreur lors de la récupération de la session:', error)
+      } finally {
+        setLoading(false)
+      }
     }
 
     getInitialSession()
@@ -48,31 +62,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-    return { error }
+    const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!hasSupabaseConfig) {
+      return { error: { message: 'Configuration Supabase manquante' } as any }
+    }
+    
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+      return { error }
+    } catch (error) {
+      return { error: error as any }
+    }
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
+    const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!hasSupabaseConfig) {
+      return { error: { message: 'Configuration Supabase manquante' } as any }
+    }
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      return { error }
+    } catch (error) {
+      return { error: error as any }
+    }
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
+    const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!hasSupabaseConfig) {
+      return { error: { message: 'Configuration Supabase manquante' } as any }
+    }
+    
+    try {
+      const { error } = await supabase.auth.signOut()
+      return { error }
+    } catch (error) {
+      return { error: error as any }
+    }
   }
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    })
-    return { error }
+    const hasSupabaseConfig = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    if (!hasSupabaseConfig) {
+      return { error: { message: 'Configuration Supabase manquante' } as any }
+    }
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+      return { error }
+    } catch (error) {
+      return { error: error as any }
+    }
   }
 
   const value = {
